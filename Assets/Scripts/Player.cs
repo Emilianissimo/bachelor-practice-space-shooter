@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Perks;
 
 public class Player : MonoBehaviour
 {
@@ -9,62 +10,81 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
+    private GameObject _trippleLaserPrefab;
+    [SerializeField]
     private float _fireRate = 0.5f;
     private float _canFire = -1f;
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnManager;
 
+    [SerializeField]
+    private ShootingModes _shootingMode = ShootingModes.SingleShot;
+    private Dictionary<ShootingModes, GameObject> _shootingModes;
+
     // Start is called before the first frame update
     void Start()
     {
-        this.transform.position = new Vector3(0, 0, 0);
-        this._spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
-        if (this._spawnManager == null)
+        transform.position = new Vector3(0, 0, 0);
+
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        if (_spawnManager == null)
         {
             Debug.LogError("The SpawnManager not found");
         }
+
+        // Initializing ShootingModes map, it will need to be done here
+        // Optimized type of perks in hash map and easy to modify and extend
+        _shootingModes = new Dictionary<ShootingModes, GameObject>
+        {
+            {ShootingModes.SingleShot, _laserPrefab },
+            {ShootingModes.TrippleShot, _trippleLaserPrefab }
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
         CalculateMovement();
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > this._canFire)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
-            this._canFire = Time.time + this._fireRate;
             Shoot();
         }
     }
 
-    public void Damage(int damage)
-    {
-        this._lives -= damage;
-        if (this._lives < 1)
-        {
-            this._spawnManager.OnPlayerDeath();
-            Destroy(this.gameObject);
-        }
-    }
-
+    /// <summary>
+    /// Shooting methodm can be runned only in case of passed cooldown (_canFire).
+    /// Setting new cooldown using the _fireRate value;
+    /// Instantiates lasers according to current powerup.
+    /// </summary>
     private void Shoot()
     {
-        Vector3 laserPosition = new(transform.position.x, transform.position.y + 1.5f, transform.position.z);
+        _canFire = Time.time + _fireRate;
+        Vector3 pos3 = transform.position;
+        if (_shootingMode == ShootingModes.SingleShot)
+        {
+            pos3.y += 0.8f;
+        }
         Instantiate(
-            this._laserPrefab,
-            laserPosition,
+            _shootingModes[_shootingMode],
+            pos3,
             Quaternion.identity
-            );
+        );
     }
 
-    private void CalculateMovement ()
+    /// <summary>
+    /// Calculating movement using field _speed. 
+    /// Moving by reading input from WASD on horizontal and vertical axis.
+    /// Y axis is limited, X axis is cycled.
+    /// </summary>
+    private void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticallInput = Input.GetAxis("Vertical");
 
         Vector3 direction = new(horizontalInput, verticallInput, 0);
 
-        transform.Translate(this._speed * Time.deltaTime * direction);
+        transform.Translate(_speed * Time.deltaTime * direction);
 
 
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, min: -4.5f, max: 3.6f), 0);
@@ -78,5 +98,42 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(11.5f, transform.position.y, 0);
         }
+    }
+
+    /// <summary>
+    /// Damaging player on amount of damage we provided.
+    /// </summary>
+    /// <param name="damage">Amount of damage</param>
+    public void Damage(int damage)
+    {
+        _lives -= damage;
+        if (_lives < 1)
+        {
+            _spawnManager.OnPlayerDeath();
+            Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Collecting shooting powerup
+    /// </summary>
+    /// <param name="mode">ShootingModes enum value</param>
+    public void CollectPowerShootingUp(ShootingModes mode)
+    {
+        if (_shootingModes.ContainsKey(mode))
+        {
+            _shootingMode = mode;
+            StartCoroutine(TrippleShotPowerDownRoutine());
+        }
+    }
+
+    /// <summary>
+    /// Routine to disable powerup after 5 seconds (TrippleShot)
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator TrippleShotPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _shootingMode = ShootingModes.SingleShot;
     }
 }

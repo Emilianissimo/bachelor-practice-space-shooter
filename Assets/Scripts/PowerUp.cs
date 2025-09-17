@@ -1,17 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Perks;
 
-public class Enemy : MonoBehaviour
+public class PowerUp : MonoBehaviour
 {
     [SerializeField]
-    private float _speed = 2f;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        transform.position = new Vector3(0, 5, 0);
-    }
+    private float _speed = 3f;
 
     // Update is called once per frame
     void Update()
@@ -20,36 +15,32 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Calculating movement using field _speed. Loop on Y axis. Going down.
+    /// Calculating movement using field _speed. Destroy object on passing bottom line.
     /// </summary>
-    private void CalculateMovement()
+    void CalculateMovement()
     {
         transform.Translate(_speed * Time.deltaTime * Vector3.down);
-
         float currentPositionY = transform.position.y;
         if (currentPositionY < -5)
         {
-            transform.position = new Vector3(Random.Range(-11.5f, 11.5f), 5, 0);
+            Destroy(gameObject);
         }
     }
 
     /// <summary>
-    /// On collide with laser - destroy. On player - destroy & damage.
+    /// Triggering on collission entered. Collecting this powerup by player. Desroying the object of param other is Player
     /// </summary>
-    /// <param name="other">Laser, Player</param>
+    /// <param name="other">
+    /// An actual object which collided with current
+    /// </param>
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             if (other.transform.TryGetComponent<Player>(out var player))
             {
-                player.Damage(1);
+                player.CollectPowerShootingUp(ShootingModes.TrippleShot);
             }
-            Destroy(this.gameObject);
-        } 
-        if (other.CompareTag("Laser"))
-        {
-            Destroy(other.gameObject);
             Destroy(this.gameObject);
         }
     }

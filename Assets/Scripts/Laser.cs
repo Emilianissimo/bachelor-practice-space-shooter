@@ -9,11 +9,16 @@ public class Laser : MonoBehaviour
     [SerializeField]
     private float _speed = 5f;
 
-    // Update is called once per frame
+    /// <summary>
+    /// Rinning new laser and destroy laser and its parent if it exists after 2 seconds (which is enough with speed 5m per sec
+    /// </summary>
     void Update()
     {
-        transform.Translate(this._speed * Time.deltaTime * Vector3.up);
-        // enough time to escape camera view with 5m/per sec
-        Destroy(this.gameObject, 2);
+        transform.Translate(_speed * Time.deltaTime * Vector3.up);
+        Destroy(gameObject, 2);
+        if (transform.parent != null)
+        {
+            Destroy(transform.parent.gameObject, 2);
+        }
     }
 }
