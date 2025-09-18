@@ -15,9 +15,8 @@ public class SpawnManager : MonoBehaviour
 
     [SerializeField]
     private List<GameObject> _powerUps;
-    
-    // Update is called once per frame
-    void Start()
+
+    public void StartSpawning()
     {
         StartCoroutine(EnemiesSpawnRoutine());
         StartCoroutine(PowerUpsSpawnRoutine());
@@ -35,6 +34,7 @@ public class SpawnManager : MonoBehaviour
     /// <returns>Yield of delay to rerun</returns>
     private IEnumerator EnemiesSpawnRoutine()
     {
+        yield return new WaitForSeconds(2.0f);
         while (_spawning)
         {
             Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 5, 0);
@@ -55,6 +55,7 @@ public class SpawnManager : MonoBehaviour
     /// <returns>Yield of random delay (3-7 secs) to rerun</returns>
     private IEnumerator PowerUpsSpawnRoutine()
     {
+        yield return new WaitForSeconds(5.0f);
         while (_spawning)
         {
             GameObject powerUp = _powerUps[Random.Range(0, _powerUps.Count)];

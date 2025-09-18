@@ -1,3 +1,12 @@
+namespace ScenesNamespace
+{
+	public enum Scenes
+	{
+		MainMenu,
+		Game,
+	}
+}
+
 namespace Perks
 {
 	public enum ShootingModes

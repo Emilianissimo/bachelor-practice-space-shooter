@@ -40,6 +40,9 @@ public class Player : MonoBehaviour
     private GameObject _shieldVisualiser;
 
     [SerializeField]
+    private GameObject _rightEngine, _leftEngine;
+
+    [SerializeField]
     private int _score;
 
     private UI_Manager _UIManager;
@@ -150,6 +153,12 @@ public class Player : MonoBehaviour
         }
         _lives -= damage;
         _UIManager.SetLives(_lives);
+
+        if (_lives == 2){
+            _leftEngine.SetActive(true);
+        }else if(_lives == 1){
+            _rightEngine.SetActive(true);
+        }
         if (_lives < 1)
         {
             _spawnManager.OnPlayerDeath();

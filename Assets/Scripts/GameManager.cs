@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
-public enum Scenes
-{
-    Game
-}
+using ScenesNamespace;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,13 +10,17 @@ public class GameManager : MonoBehaviour
     private bool _isGameOver;
 
     /// <summary>
-    /// Operate user input to restart the Game (Scene)
+    /// Operate user input
     /// </summary>
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R) && _isGameOver)
         {
             SceneManager.LoadScene((int)Scenes.Game);
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene((int)Scenes.MainMenu);
         }
     }
 
