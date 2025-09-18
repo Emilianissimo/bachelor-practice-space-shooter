@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6541527972467424966}
   - component: {fileID: 5372397671392516796}
   m_Layer: 0
-  m_Name: TrippleShotPowerUp
+  m_Name: TrippleShot_Powerup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: -0.27274752}

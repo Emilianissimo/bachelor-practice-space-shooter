@@ -5,4 +5,17 @@ namespace Perks
 		SingleShot,
 		TrippleShot
 	}
+
+	public enum SpeedModes
+	{
+		Default,
+		Increased,
+		Decreased
+	}
+
+	public enum ShieldStatuses
+	{
+		Off,
+		On
+	}
 }

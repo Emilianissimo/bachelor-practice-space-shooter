@@ -13,6 +13,9 @@ public class SpawnManager : MonoBehaviour
     private GameObject _trippleShotPowerUpPrefab;
     private bool _spawning = true;
 
+    [SerializeField]
+    private List<GameObject> _powerUps;
+    
     // Update is called once per frame
     void Start()
     {
@@ -54,9 +57,10 @@ public class SpawnManager : MonoBehaviour
     {
         while (_spawning)
         {
+            GameObject powerUp = _powerUps[Random.Range(0, _powerUps.Count)];
             Vector3 newPowerUPPosition = new(Random.Range(-11.5f, 11.5f), 5, 0);
-            GameObject newPowerUP = Instantiate(
-                _trippleShotPowerUpPrefab,
+            Instantiate(
+                powerUp,
                 newPowerUPPosition,
                 Quaternion.identity
                 );

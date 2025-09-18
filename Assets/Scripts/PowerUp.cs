@@ -3,8 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Perks;
 
+public enum PowerUps
+{
+    TrippleShot,
+    SpeedMultiplier,
+    Shield
+}
+
 public class PowerUp : MonoBehaviour
 {
+    [SerializeField]
+    private PowerUps _powerUpID;
+
     [SerializeField]
     private float _speed = 3f;
 
@@ -39,8 +49,23 @@ public class PowerUp : MonoBehaviour
         {
             if (other.transform.TryGetComponent<Player>(out var player))
             {
-                player.CollectPowerShootingUp(ShootingModes.TrippleShot);
-            }
+                switch (_powerUpID)
+                {
+                    case PowerUps.TrippleShot:
+                        player.CollectPowerShootingUp(ShootingModes.TrippleShot);
+                        break;
+                    case PowerUps.SpeedMultiplier:
+                        SpeedModes[] options = { SpeedModes.Increased, SpeedModes.Decreased };
+                        SpeedModes value = options[Random.Range(0, options.Length)];
+                        player.CollectPowerSpeedUpOrDown(value);
+                        break;
+                    case (PowerUps.Shield):
+                        player.CollectPowerShield();
+                        break;
+                    default:
+                        break;
+                }
+            }   
             Destroy(this.gameObject);
         }
     }
