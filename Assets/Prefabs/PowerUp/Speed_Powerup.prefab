@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _powerUpID: 1
   _speed: 1
+  _collectSound: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
 --- !u!95 &8087458702779696237
 Animator:
   serializedVersion: 5

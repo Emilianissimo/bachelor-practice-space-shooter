@@ -18,6 +18,9 @@ public class PowerUp : MonoBehaviour
     [SerializeField]
     private float _speed = 3f;
 
+    [SerializeField]
+    private AudioClip _collectSound;
+
     // Update is called once per frame
     void Update()
     {
@@ -65,7 +68,8 @@ public class PowerUp : MonoBehaviour
                     default:
                         break;
                 }
-            }   
+            }
+            AudioSource.PlayClipAtPoint(_collectSound, transform.position);
             Destroy(this.gameObject);
         }
     }

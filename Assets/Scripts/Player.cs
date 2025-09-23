@@ -45,6 +45,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _score;
 
+    [SerializeField]
+    private AudioClip _shootingSound;
+    private AudioSource _audioSource;
+
     private UI_Manager _UIManager;
 
     // Start is called before the first frame update
@@ -56,8 +60,12 @@ public class Player : MonoBehaviour
         if (_spawnManager == null) Debug.LogError("The SpawnManager not found");
         _UIManager = GameObject.Find("Canvas").GetComponent<UI_Manager>();
         if (_UIManager == null) Debug.LogError("The UIManager not found");
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) Debug.LogError("The AudioSource not found");
 
         _UIManager.SetLives(_lives);
+
+        _audioSource.clip = _shootingSound;
 
         // Initializing ShootingModes map, it will need to be done here
         // Optimized type of perks in hash map and easy to modify and extend
@@ -103,6 +111,8 @@ public class Player : MonoBehaviour
             pos3,
             Quaternion.identity
         );
+
+        _audioSource.Play();
     }
 
     /// <summary>

@@ -8,6 +8,8 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _speed = 2f;
 
+    private AudioSource _audioSource;
+
     private Player _player;
 
     private Animator _animator;
@@ -20,6 +22,8 @@ public class Enemy : MonoBehaviour
         if (_player == null) Debug.LogWarning("Player not found");
         _animator = gameObject.GetComponent<Animator>();
         if (_animator == null) Debug.LogWarning("Animation not found");
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) Debug.LogWarning("AudioSource not found");
     }
 
     // Update is called once per frame
@@ -64,6 +68,7 @@ public class Enemy : MonoBehaviour
         {
             _animator.SetTrigger("OnEnemyDeath");
             _speed = 0;
+            _audioSource.Play();
             Destroy(this.gameObject, 2.8f);
         }
     }
