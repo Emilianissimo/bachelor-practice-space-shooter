@@ -51,7 +51,16 @@ public class Player : MonoBehaviour
 
     private UI_Manager _UIManager;
 
-    // Start is called before the first frame update
+    void Awake()
+    {
+        _speedModes = new Dictionary<SpeedModes, float>
+        {
+            { SpeedModes.Default, 1f },
+            { SpeedModes.Increased, _speedIncreased },
+            { SpeedModes.Decreased, _speedDecreased }
+        };
+    }
+
     void Start()
     {
         transform.position = new Vector3(0, 0, 0);
@@ -73,13 +82,6 @@ public class Player : MonoBehaviour
         {
             {ShootingModes.SingleShot, _laserPrefab },
             {ShootingModes.TrippleShot, _trippleLaserPrefab }
-        };
-
-        _speedModes = new Dictionary<SpeedModes, float>
-        {
-            {SpeedModes.Default, 1 },
-            {SpeedModes.Increased, _speedIncreased },
-            {SpeedModes.Decreased, _speedDecreased },
         };
     }
 
