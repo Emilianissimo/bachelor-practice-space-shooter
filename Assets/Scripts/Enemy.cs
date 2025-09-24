@@ -8,6 +8,13 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _speed = 2f;
 
+    [SerializeField]
+    private GameObject _laserPrefab;
+
+    [SerializeField]
+    private float _fireRate = 3f;
+    private float _canFire = -1f;
+
     private AudioSource _audioSource;
 
     private Player _player;
@@ -30,6 +37,35 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         CalculateMovement();
+        if (Time.time > _canFire)
+        {
+            Shoot();
+        }
+    }
+
+    /// <summary>
+    /// Shooting methodm can be runned only in case of passed cooldown (_canFire).
+    /// Setting new cooldown using the _fireRate value which is random between 3 and 7 secs;
+    /// Instantiates lasers according to current powerup.
+    /// </summary>
+    private void Shoot()
+    {
+        _fireRate = Random.Range(3f, 7f);
+        _canFire = Time.time + _fireRate;
+        Vector3 pos3 = transform.position;
+        pos3.y -= 0.2f;
+        GameObject laser = Instantiate(
+            _laserPrefab,
+            pos3,
+            Quaternion.identity
+        );
+        Laser[] lasers = laser.GetComponentsInChildren<Laser>();
+        for (int i = 0; i < lasers.Length; ++i)
+        {
+            lasers[i].setIsEnemy(true);
+        }
+
+        _audioSource.Play();
     }
 
     /// <summary>
@@ -69,6 +105,7 @@ public class Enemy : MonoBehaviour
             _animator.SetTrigger("OnEnemyDeath");
             _speed = 0;
             _audioSource.Play();
+            Destroy(GetComponent<Collider2D>());
             Destroy(this.gameObject, 2.8f);
         }
     }
