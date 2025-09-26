@@ -10,6 +10,9 @@ public class UI_Manager : MonoBehaviour
     private Text _scoreNumberText;
 
     [SerializeField]
+    private Text _ammoNumberText;
+
+    [SerializeField]
     private Image _LivesImage;
 
     [SerializeField]
@@ -23,10 +26,14 @@ public class UI_Manager : MonoBehaviour
 
     private GameManager _gameManager;
 
+    private Animator _ammoNumberTextAnimator;
+
     void Start()
     {
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if (_gameManager == null) Debug.LogWarning("Game_Manager not found!");
+        _ammoNumberTextAnimator = transform.Find("Ammo_Number_Text").GetComponent<Animator>();
+        if (_ammoNumberTextAnimator == null) Debug.LogWarning("Ammo_Number_Text not found!");
     }
 
     /// <summary>
@@ -46,8 +53,14 @@ public class UI_Manager : MonoBehaviour
     {
         try
         {
-            _LivesImage.sprite = _liveSprites[value];            
-        } catch (IndexOutOfRangeException) {}
+            _LivesImage.sprite = _liveSprites[value];
+        }
+        catch (IndexOutOfRangeException) { }
+    }
+
+    public void SetAmmo(int value)
+    {
+        _ammoNumberText.text = value.ToString();
     }
 
     /// <summary>
@@ -82,5 +95,11 @@ public class UI_Manager : MonoBehaviour
     {
         _gameOverCanvas.gameObject.SetActive(value);
         if (value) _gameManager.GameOver();
+    }
+
+
+    public void WarnOnNotEnoughAmmo()
+    {
+        _ammoNumberTextAnimator.SetTrigger("onAmmoEnds");;
     }
 }

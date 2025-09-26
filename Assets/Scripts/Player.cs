@@ -31,6 +31,8 @@ public class Player : MonoBehaviour
     private ShootingModes _shootingMode = ShootingModes.SingleShot;
     private Dictionary<ShootingModes, GameObject> _shootingModes;
 
+    private Dictionary<ShootingModes, int> _ammoSpentTypes;
+
     [SerializeField]
     private SpeedModes _speedMode = SpeedModes.Default;
     private Dictionary<SpeedModes, float> _speedModes;
@@ -57,16 +59,23 @@ public class Player : MonoBehaviour
 
     [Header("Thruster Settings")]
     // Maximum seconds of using thursters at once
-    [SerializeField] private float _maxCharge = 5f;
+    [SerializeField]
+    private float _maxCharge = 5f;
     // Speed of recharging
-    [SerializeField] private float _rechargeRate = 1f;
+    [SerializeField]
+    private float _rechargeRate = 1f;
     // Burn rate in seconds
-    [SerializeField] private float _burnRate = 1f;
-    [SerializeField] private Slider _thrusterBar;
+    [SerializeField]
+    private float _burnRate = 1f;
+    [SerializeField]
+    private Slider _thrusterBar;
     private float _cooldownTime;
     private bool _inCooldown = false;
     private float _currentCharge;
     private bool _isThrusting = false;
+
+    [SerializeField]
+    private int _ammoCount = 15;
 
     void Awake()
     {
@@ -75,6 +84,11 @@ public class Player : MonoBehaviour
             { SpeedModes.Default, 1f },
             { SpeedModes.Increased, _speedIncreased },
             { SpeedModes.Decreased, _speedDecreased }
+        };
+        _ammoSpentTypes = new Dictionary<ShootingModes, int>
+        {
+            { ShootingModes.SingleShot, 1 },
+            { ShootingModes.TrippleShot, 3 },
         };
     }
 
@@ -90,6 +104,7 @@ public class Player : MonoBehaviour
         if (_audioSource == null) Debug.LogError("The AudioSource not found");
 
         _UIManager.SetLives(_lives);
+        _UIManager.SetAmmo(_ammoCount);
 
         _audioSource.clip = _shootingSound;
 
@@ -131,6 +146,15 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Shoot()
     {
+        // If spending ammo with active prefab will decrease amount to negative, we need to prevent shooting
+        if (!CheckEnoughAmmoAvailable())
+        {
+            _UIManager.WarnOnNotEnoughAmmo();
+            return;
+        }
+
+        SpendAmmo();
+
         _canFire = Time.time + _fireRate;
         Vector3 pos3 = transform.position;
         if (_shootingMode == ShootingModes.SingleShot)
@@ -144,6 +168,17 @@ public class Player : MonoBehaviour
         );
 
         _audioSource.Play();
+    }
+
+    private bool CheckEnoughAmmoAvailable()
+    {
+        return (_ammoCount - _ammoSpentTypes[_shootingMode]) >= 0;
+    }
+
+    private void SpendAmmo()
+    {
+        _ammoCount -= _ammoSpentTypes[_shootingMode];
+        _UIManager.SetAmmo(_ammoCount);
     }
 
     /// <summary>
