@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,9 @@ public class UI_Manager : MonoBehaviour
 
     [SerializeField]
     private Sprite[] _liveSprites;
+
+    [SerializeField]
+    private Image[] _shieldsImages;
 
     [SerializeField]
     private Canvas _gameOverCanvas;
@@ -40,7 +44,33 @@ public class UI_Manager : MonoBehaviour
     /// <param name="value">Int in range of 0-3</param>
     public void SetLives(int value)
     {
-        _LivesImage.sprite = _liveSprites[value];
+        try
+        {
+            _LivesImage.sprite = _liveSprites[value];            
+        } catch (IndexOutOfRangeException) {}
+    }
+
+    /// <summary>
+    /// Public setter to update player shield strength in UI
+    /// </summary>
+    /// <param name="value">Int in range of 0-3</param>
+    public void SetShieldStrength(
+        int value,
+        bool isDamaging
+    )
+    {
+        if (!isDamaging)
+        {
+            foreach (Image img in _shieldsImages)
+                img.gameObject.SetActive(true);
+            return;
+        }
+        value = Mathf.Clamp(value, 0, _shieldsImages.Length);
+
+        for (int i = 0; i < _shieldsImages.Length; i++)
+        {
+            _shieldsImages[i].gameObject.SetActive(i < value);
+        }
     }
 
     /// <summary>

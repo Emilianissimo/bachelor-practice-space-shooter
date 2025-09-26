@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Perks;
+using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class Player : MonoBehaviour
 {
@@ -35,6 +37,8 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private ShieldStatuses _shieldStatus = ShieldStatuses.Off;
+    [SerializeField]
+    private int _shieldStrength = 3;
 
     [SerializeField]
     private GameObject _shieldVisualiser;
@@ -50,6 +54,19 @@ public class Player : MonoBehaviour
     private AudioSource _audioSource;
 
     private UI_Manager _UIManager;
+
+    [Header("Thruster Settings")]
+    // Maximum seconds of using thursters at once
+    [SerializeField] private float _maxCharge = 5f;
+    // Speed of recharging
+    [SerializeField] private float _rechargeRate = 1f;
+    // Burn rate in seconds
+    [SerializeField] private float _burnRate = 1f;
+    [SerializeField] private Slider _thrusterBar;
+    private float _cooldownTime;
+    private bool _inCooldown = false;
+    private float _currentCharge;
+    private bool _isThrusting = false;
 
     void Awake()
     {
@@ -83,11 +100,23 @@ public class Player : MonoBehaviour
             {ShootingModes.SingleShot, _laserPrefab },
             {ShootingModes.TrippleShot, _trippleLaserPrefab }
         };
+
+        // Set current thruster charge. On start it is full
+        _currentCharge = _maxCharge;
+        if (_thrusterBar) _thrusterBar.value = 1f;
+
+        // Cooldown time equals to the max charge divided to recharge that means
+        // we will be synced between ui and real cooldown
+        _cooldownTime = _maxCharge / _rechargeRate;
     }
 
     // Update is called once per frame
     void Update()
     {
+        _isThrusting = Input.GetKey(KeyCode.LeftShift);
+        // Handle first to disable thrusting on not enough charge
+        HandleThrusters();
+        // Then calculate speed
         CalculateMovement();
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
@@ -133,6 +162,8 @@ public class Player : MonoBehaviour
         transform.Translate(
             (_speed *
             _speedModes[_speedMode]) *
+            // Increasing speed by checking if shift currently pressed
+            (_isThrusting ? 1.4f : 1f) *
             Time.deltaTime *
             direction
         );
@@ -159,16 +190,24 @@ public class Player : MonoBehaviour
     {
         if (_shieldStatus == ShieldStatuses.On)
         {
-            _shieldStatus = ShieldStatuses.Off;
-            _shieldVisualiser.SetActive(false);
+            _shieldStrength -= damage;
+            _UIManager.SetShieldStrength(_shieldStrength, true);
+            if (_shieldStrength < 1)
+            {
+                _shieldStatus = ShieldStatuses.Off;
+                _shieldVisualiser.SetActive(false);
+            }
             return;
         }
         _lives -= damage;
         _UIManager.SetLives(_lives);
 
-        if (_lives == 2){
+        if (_lives == 2)
+        {
             _leftEngine.SetActive(true);
-        }else if(_lives == 1){
+        }
+        else if (_lives == 1)
+        {
             _rightEngine.SetActive(true);
         }
         if (_lives < 1)
@@ -233,6 +272,8 @@ public class Player : MonoBehaviour
     {
         _shieldStatus = ShieldStatuses.On;
         _shieldVisualiser.SetActive(true);
+        _shieldStrength = 3;
+        _UIManager.SetShieldStrength(3, false);
     }
 
     /// <summary>
@@ -247,5 +288,46 @@ public class Player : MonoBehaviour
         }
         this._score += score;
         _UIManager.SetScore(this._score);
+    }
+
+    /// <summary>
+    /// Method to handle thrusters by working with charger bar
+    /// </summary>
+    private void HandleThrusters()
+    {
+        if (_isThrusting && _currentCharge > 0f && !_inCooldown)
+        {
+            _currentCharge -= _burnRate * Time.deltaTime;
+            _currentCharge = Mathf.Max(_currentCharge, 0f);
+            if (_currentCharge <= 0f)
+            {
+                _isThrusting = false;
+                StartCoroutine(ThrusterCooldown());
+            }
+        }
+        if (_inCooldown) {
+            _currentCharge += _rechargeRate * Time.deltaTime;
+            _currentCharge = Mathf.Min(_currentCharge, _maxCharge);
+        }
+
+        if (_thrusterBar)
+            _thrusterBar.value = _currentCharge / _maxCharge;
+    }
+
+    /// <summary>
+    /// Coroutine that sets cooldown and return ability to increase speed after it passes
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator ThrusterCooldown()
+    {
+        _inCooldown = true;
+
+        yield return new WaitForSeconds(_cooldownTime);
+
+        _currentCharge = _maxCharge;
+        _inCooldown = false;
+
+        if (_thrusterBar)
+            _thrusterBar.value = 1f;
     }
 }

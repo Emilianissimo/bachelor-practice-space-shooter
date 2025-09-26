@@ -43,6 +43,7 @@ public class Laser : MonoBehaviour
         if (other.CompareTag("Player") && _isEnemy)
         {
             if (other.transform.TryGetComponent<Player>(out var player)) player.Damage(1);
+            Destroy(gameObject);
         }
     }
 }
