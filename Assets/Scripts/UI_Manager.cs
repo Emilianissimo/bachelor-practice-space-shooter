@@ -28,12 +28,16 @@ public class UI_Manager : MonoBehaviour
 
     private Animator _ammoNumberTextAnimator;
 
+    private Animator _mainCameraAnimator;
+
     void Start()
     {
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if (_gameManager == null) Debug.LogWarning("Game_Manager not found!");
         _ammoNumberTextAnimator = transform.Find("Ammo_Number_Text").GetComponent<Animator>();
         if (_ammoNumberTextAnimator == null) Debug.LogWarning("Ammo_Number_Text not found!");
+        _mainCameraAnimator = GameObject.Find("MainCamera")?.GetComponent<Animator>();
+        if (_mainCameraAnimator == null) Debug.LogWarning("Main camera animator not found");
     }
 
     /// <summary>
@@ -100,6 +104,11 @@ public class UI_Manager : MonoBehaviour
 
     public void WarnOnNotEnoughAmmo()
     {
-        _ammoNumberTextAnimator.SetTrigger("onAmmoEnds");;
+        _ammoNumberTextAnimator.SetTrigger("onAmmoEnds"); ;
+    }
+
+    public void ShakeCamera()
+    {
+        _mainCameraAnimator.SetTrigger("onDamage");
     }
 }

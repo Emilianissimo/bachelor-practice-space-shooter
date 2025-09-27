@@ -100,6 +100,13 @@ public class Enemy : MonoBehaviour
             if (_player != null) _player.AddScore(10);
             isDestroyed = true;
         }
+
+        if (other.CompareTag("DeathRay"))
+        {
+            if (_player != null) _player.AddScore(10);
+            isDestroyed = true;
+        }
+
         if (isDestroyed)
         {
             _animator.SetTrigger("OnEnemyDeath");

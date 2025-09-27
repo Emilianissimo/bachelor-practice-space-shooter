@@ -77,6 +77,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _ammoCount = 15;
 
+    [SerializeField]
+    private GameObject _deathRayComponent;
+
     void Awake()
     {
         _speedModes = new Dictionary<SpeedModes, float>
@@ -146,6 +149,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Shoot()
     {
+        // Death Ray not counts as ammo
+        if (_shootingMode == ShootingModes.DeathRay) return;
         // If spending ammo with active prefab will decrease amount to negative, we need to prevent shooting
         if (!CheckEnoughAmmoAvailable())
         {
@@ -251,6 +256,7 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
             _UIManager.SetGameOverState(true);
         }
+        _UIManager.ShakeCamera();
     }
 
     /// <summary>
@@ -259,10 +265,44 @@ public class Player : MonoBehaviour
     /// <param name="mode">ShootingModes enum value</param>
     public void CollectPowerShootingUp(ShootingModes mode)
     {
+        // If power up is set, we need to ignore other ability to prevent collisison
+        if (_shootingMode != ShootingModes.SingleShot) return;
+
+        // We are just setting it up and using as beam without any key until it will be down
+        if (mode == ShootingModes.DeathRay)
+        {
+            _shootingMode = mode;
+            _deathRayComponent.SetActive(true);
+            StartCoroutine(ShootingPowerDownRoutine());
+            return;
+        }
+
         if (_shootingModes.ContainsKey(mode))
         {
             _shootingMode = mode;
-            StartCoroutine(TrippleShotPowerDownRoutine());
+            StartCoroutine(ShootingPowerDownRoutine());
+        }
+    }
+
+    public void CollectAmmo(int amount)
+    {
+        _ammoCount += amount;
+        _UIManager.SetAmmo(_ammoCount);
+    }
+
+    public void CollectFirstAid()
+    {
+        if (_lives > 2) return;
+        _lives++;
+        _UIManager.SetLives(_lives);
+
+        if (_lives > 2)
+        {
+            _leftEngine.SetActive(false);
+        }
+        else if (_lives > 1)
+        {
+            _rightEngine.SetActive(false);
         }
     }
 
@@ -270,9 +310,11 @@ public class Player : MonoBehaviour
     /// Routine to disable powerup after 5 seconds
     /// </summary>
     /// <returns>yield sleep for 5 sec</returns>
-    private IEnumerator TrippleShotPowerDownRoutine()
+    private IEnumerator ShootingPowerDownRoutine()
     {
         yield return new WaitForSeconds(5.0f);
+        // Disabling ray as component first
+        if (_shootingMode == ShootingModes.DeathRay) _deathRayComponent.SetActive(false);
         _shootingMode = ShootingModes.SingleShot;
     }
 
@@ -340,7 +382,8 @@ public class Player : MonoBehaviour
                 StartCoroutine(ThrusterCooldown());
             }
         }
-        if (_inCooldown) {
+        if (_inCooldown)
+        {
             _currentCharge += _rechargeRate * Time.deltaTime;
             _currentCharge = Mathf.Min(_currentCharge, _maxCharge);
         }

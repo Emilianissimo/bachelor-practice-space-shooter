@@ -7,7 +7,10 @@ public enum PowerUps
 {
     TrippleShot,
     SpeedMultiplier,
-    Shield
+    Shield,
+    Ammo,
+    FirstAid,
+    DeathRay,
 }
 
 public class PowerUp : MonoBehaviour
@@ -64,6 +67,15 @@ public class PowerUp : MonoBehaviour
                         break;
                     case (PowerUps.Shield):
                         player.CollectPowerShield();
+                        break;
+                    case (PowerUps.Ammo):
+                        player.CollectAmmo(5);
+                        break;
+                    case (PowerUps.FirstAid):
+                        player.CollectFirstAid();
+                        break;
+                    case (PowerUps.DeathRay):
+                        player.CollectPowerShootingUp(ShootingModes.DeathRay);
                         break;
                     default:
                         break;

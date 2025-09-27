@@ -12,7 +12,8 @@ namespace Perks
 	public enum ShootingModes
 	{
 		SingleShot,
-		TrippleShot
+		TrippleShot,
+		DeathRay,
 	}
 
 	public enum SpeedModes

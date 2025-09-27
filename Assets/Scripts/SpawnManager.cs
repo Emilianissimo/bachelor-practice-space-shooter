@@ -15,6 +15,8 @@ public class SpawnManager : MonoBehaviour
 
     [SerializeField]
     private List<GameObject> _powerUps;
+    [SerializeField]
+    private List<float> _weights;
 
     public void StartSpawning()
     {
@@ -48,6 +50,21 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    private GameObject ChoosePowerUpByWeight()
+    {
+        float total = 0f;
+        foreach (float w in _weights) total += w;
+        float rand = Random.value * total;
+        float accum = 0f;
+        int index = 0;
+        for (int i = 0; i < _weights.Count; i++)
+        {
+            accum += _weights[i];
+            if (rand <= accum) { index = i; break; }
+        }
+        return _powerUps[index];
+    }
+
     /// <summary>
     /// Spawning routine, spawns objects not related to user input;
     /// PowerUps.
@@ -58,7 +75,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(5.0f);
         while (_spawning)
         {
-            GameObject powerUp = _powerUps[Random.Range(0, _powerUps.Count)];
+            GameObject powerUp =  ChoosePowerUpByWeight();
             Vector3 newPowerUPPosition = new(Random.Range(-11.5f, 11.5f), 5, 0);
             Instantiate(
                 powerUp,
