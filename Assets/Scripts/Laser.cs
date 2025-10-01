@@ -8,7 +8,6 @@ public class Laser : MonoBehaviour
     // Start is called before the first frame update
     [SerializeField]
     private float _speed = 5f;
-
     private bool _isEnemy = false;
 
     /// <summary>

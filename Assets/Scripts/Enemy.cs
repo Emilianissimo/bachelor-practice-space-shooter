@@ -20,6 +20,8 @@ public class Enemy : MonoBehaviour
     private Player _player;
 
     private Animator _animator;
+    private float _randomX;
+    private float _timer = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,8 @@ public class Enemy : MonoBehaviour
         if (_animator == null) Debug.LogWarning("Animation not found");
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) Debug.LogWarning("AudioSource not found");
+
+        _randomX = Random.Range(-1f, 1f);
     }
 
     // Update is called once per frame
@@ -64,7 +68,6 @@ public class Enemy : MonoBehaviour
         {
             lasers[i].setIsEnemy(true);
         }
-
         _audioSource.Play();
     }
 
@@ -73,7 +76,12 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void CalculateMovement()
     {
-        transform.Translate(_speed * Time.deltaTime * Vector3.down);
+        _timer += Time.deltaTime;
+        if (_timer >= 1.5f) // once per 1.5 secs changing direction to random again
+            _randomX = Random.Range(-1f, 1f);
+        _timer = 0;
+        Vector3 direction = (Vector3.down + Vector3.right * _randomX).normalized;
+        transform.Translate(_speed * Time.deltaTime * direction);
 
         float currentPositionY = transform.position.y;
         if (currentPositionY < -5)
