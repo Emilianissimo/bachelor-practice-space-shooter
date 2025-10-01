@@ -23,6 +23,11 @@ public class Enemy : MonoBehaviour
     private float _randomX;
     private float _timer = 0f;
 
+    [SerializeField]
+    private bool _evading = false;
+    private float _evadingDirection;
+    private bool _isDestroyed = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,6 +45,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_isDestroyed) return;
         CalculateMovement();
         if (Time.time > _canFire)
         {
@@ -76,11 +82,20 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void CalculateMovement()
     {
+        Vector3 direction;
+        // We are gonna evade laser if value is on
+        if (_evading)
+        {
+            direction = (Vector3.right * _evadingDirection).normalized;
+            transform.Translate((_speed * 1.5f) * Time.deltaTime * direction);
+            return;
+        }
+
         _timer += Time.deltaTime;
         if (_timer >= 1.5f) // once per 1.5 secs changing direction to random again
             _randomX = Random.Range(-1f, 1f);
         _timer = 0;
-        Vector3 direction = (Vector3.down + Vector3.right * _randomX).normalized;
+        direction = (Vector3.down + Vector3.right * _randomX).normalized;
         transform.Translate(_speed * Time.deltaTime * direction);
 
         float currentPositionY = transform.position.y;
@@ -91,36 +106,54 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
+    /// On collide space with laser try to evade it with delay
+    /// </summary>
+    public void EvadeLaser()
+    {
+        StartCoroutine(EvadeLaserCouroutine());
+    }
+
+    private IEnumerator EvadeLaserCouroutine()
+    {
+        _evading = true;
+        _evadingDirection = Random.Range(-1f, 1f);
+        yield return new WaitForSeconds(1);
+        _evading = false;
+    }
+
+    /// <summary>
     /// On collide with laser - destroy. On player - destroy & damage.
     /// </summary>
     /// <param name="other">Laser, Player</param>
-    private void OnTriggerEnter2D(Collider2D other)
+    public void TriggerController(Collider2D other)
     {
-        bool isDestroyed = false;
         if (other.CompareTag("Player"))
         {
             if (other.transform.TryGetComponent<Player>(out var player)) player.Damage(1);
-            isDestroyed = true;
+            _isDestroyed = true;
         }
         if (other.CompareTag("Laser"))
         {
             Destroy(other.gameObject);
             if (_player != null) _player.AddScore(10);
-            isDestroyed = true;
+            _isDestroyed = true;
         }
 
         if (other.CompareTag("DeathRay"))
         {
             if (_player != null) _player.AddScore(10);
-            isDestroyed = true;
+            _isDestroyed = true;
         }
 
-        if (isDestroyed)
+        if (_isDestroyed)
         {
             _animator.SetTrigger("OnEnemyDeath");
             _speed = 0;
             _audioSource.Play();
-            Destroy(GetComponent<Collider2D>());
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
             Destroy(this.gameObject, 2.8f);
         }
     }

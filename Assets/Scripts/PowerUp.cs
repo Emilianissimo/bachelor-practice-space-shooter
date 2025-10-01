@@ -24,6 +24,14 @@ public class PowerUp : MonoBehaviour
     [SerializeField]
     private AudioClip _collectSound;
 
+    private Player _player;
+
+    void Start()
+    {
+        _player = GameObject.Find("Player").GetComponent<Player>();
+        if (_player == null) Debug.LogWarning("Player not found");
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -35,6 +43,15 @@ public class PowerUp : MonoBehaviour
     /// </summary>
     void CalculateMovement()
     {
+        // If C pressed, move towards the player
+        if (Input.GetKey(KeyCode.C))
+        {
+            Vector3 playerPosition = _player.transform.position;
+            // Normalizing position. Without that we will get absolute and incorrect position for our purpose
+            Vector3 direction = (playerPosition - transform.position).normalized;
+            transform.Translate(_speed * 2 * Time.deltaTime * direction);
+            return;
+        }
         transform.Translate(_speed * Time.deltaTime * Vector3.down);
         float currentPositionY = transform.position.y;
         if (currentPositionY < -5)
