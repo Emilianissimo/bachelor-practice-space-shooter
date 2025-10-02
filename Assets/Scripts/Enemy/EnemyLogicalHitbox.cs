@@ -10,7 +10,7 @@ public class EnemyLogicalHitbox : MonoBehaviour
     {
         _enemyParent = GetComponentInParent<Enemy>();
     }
-    
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Laser"))
@@ -21,6 +21,15 @@ public class EnemyLogicalHitbox : MonoBehaviour
 
                 _enemyParent.EvadeLaser();
             }
+        }
+        if (other.CompareTag("Player"))
+        {
+            _enemyParent.SetRamPlayer(true);
+        }
+        else
+        {
+            // Default status
+            _enemyParent.SetRamPlayer(false);
         }
     }
 }

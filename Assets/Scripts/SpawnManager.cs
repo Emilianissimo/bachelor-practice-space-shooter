@@ -7,6 +7,10 @@ public class SpawnManager : MonoBehaviour
 {
     [SerializeField]
     private GameObject _enemyPrefab;
+
+    [SerializeField]
+    private GameObject _dronKillerPrefab;
+
     [SerializeField]
     private GameObject _enemyContainer;
     [SerializeField]
@@ -39,13 +43,20 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
         while (_spawning)
         {
-            Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 5, 0);
+            Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
             GameObject newEnemy = Instantiate(
                 _enemyPrefab,
                 enemyPosition,
                 Quaternion.identity
-                );
+            );
+            Vector3 dronKillerPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
+            GameObject newDronKiller = Instantiate(
+                _dronKillerPrefab,
+                dronKillerPosition,
+                Quaternion.identity
+            );
             newEnemy.transform.SetParent(_enemyContainer.transform);
+            newDronKiller.transform.SetParent(_enemyContainer.transform);
             yield return new WaitForSeconds(5.0f);
         }
     }

@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - Laser
   - DeathRay
+  - DronKiller
+  - PowerUP
   layers:
   - Default
   - TransparentFX

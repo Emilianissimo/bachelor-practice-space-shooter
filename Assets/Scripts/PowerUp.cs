@@ -101,5 +101,10 @@ public class PowerUp : MonoBehaviour
             AudioSource.PlayClipAtPoint(_collectSound, transform.position);
             Destroy(this.gameObject);
         }
+        if (other.CompareTag("Laser"))
+        {
+            AudioSource.PlayClipAtPoint(_collectSound, transform.position);
+            Destroy(this.gameObject);
+        }
     }
 }

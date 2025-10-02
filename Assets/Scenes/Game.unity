@@ -656,6 +656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyPrefab: {fileID: 7578874304009644042, guid: 0390ffb8764d1234b960110c552b613d, type: 3}
+  _dronKillerPrefab: {fileID: 7513596392038561926, guid: 223ef151ae569480d96c1789f6496a0b, type: 3}
   _enemyContainer: {fileID: 205438074}
   _trippleShotPowerUpPrefab: {fileID: 5912819116568338215, guid: 6a075475cabdd4b4aa39f6380e55c64f, type: 3}
   _powerUps:
@@ -669,8 +670,8 @@ MonoBehaviour:
   - 0.2
   - 0.2
   - 0.2
-  - 0.15
-  - 0.2
+  - 0.3
+  - 0.05
   - 0.05
 --- !u!4 &322346203
 Transform:

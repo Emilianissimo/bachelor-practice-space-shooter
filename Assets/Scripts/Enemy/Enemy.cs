@@ -28,10 +28,12 @@ public class Enemy : MonoBehaviour
     private float _evadingDirection;
     private bool _isDestroyed = false;
 
+    private bool _isRammingPlayer = false;
+
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = new Vector3(0, 5, 0);
+        transform.position = new Vector3(0, 7, 0);
         _player = GameObject.Find("Player").GetComponent<Player>();
         if (_player == null) Debug.LogWarning("Player not found");
         _animator = gameObject.GetComponent<Animator>();
@@ -63,7 +65,19 @@ public class Enemy : MonoBehaviour
         _fireRate = Random.Range(3f, 7f);
         _canFire = Time.time + _fireRate;
         Vector3 pos3 = transform.position;
-        pos3.y -= 0.2f;
+        // Change position
+        float gap = 0.2f;
+        try
+        {
+            if (_player.transform.position.y > transform.position.y) gap = -2f;
+        }
+        catch (MissingReferenceException)
+        {
+            // Player is dead.
+            return;
+        }
+            
+        pos3.y -= gap;
         GameObject laser = Instantiate(
             _laserPrefab,
             pos3,
@@ -73,6 +87,7 @@ public class Enemy : MonoBehaviour
         for (int i = 0; i < lasers.Length; ++i)
         {
             lasers[i].setIsEnemy(true);
+            if (_player.transform.position.y > transform.position.y) lasers[i].setEnemyShootBackwards(true);
         }
         _audioSource.Play();
     }
@@ -88,6 +103,14 @@ public class Enemy : MonoBehaviour
         {
             direction = (Vector3.right * _evadingDirection).normalized;
             transform.Translate((_speed * 1.5f) * Time.deltaTime * direction);
+            return;
+        }
+
+        if (_isRammingPlayer)
+        {
+            Vector3 playerPosition = _player.transform.position;
+            direction = (playerPosition - transform.position).normalized;
+            transform.Translate(_speed * Time.deltaTime * direction);
             return;
         }
 
@@ -119,6 +142,16 @@ public class Enemy : MonoBehaviour
         _evadingDirection = Random.Range(-1f, 1f);
         yield return new WaitForSeconds(1);
         _evading = false;
+    }
+
+    public void SetRamPlayer(bool value)
+    {
+        _isRammingPlayer = value;
+    }
+
+    public void ShootPowerUp(PowerUp powerUp)
+    {
+        Shoot();
     }
 
     /// <summary>

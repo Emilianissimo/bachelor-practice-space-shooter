@@ -5,17 +5,26 @@ using UnityEngine.UIElements;
 
 public class Laser : MonoBehaviour
 {
-    // Start is called before the first frame update
+     // Start is called before the first frame update
     [SerializeField]
     private float _speed = 5f;
     public bool isEnemy = false;
+    private bool _enemyShootBackwards = false;
 
     /// <summary>
     /// Rinning new laser and destroy laser and its parent if it exists after 2 seconds (which is enough with speed 5m per sec
     /// </summary>
     void Update()
     {
-        Vector3 direction = isEnemy ? Vector3.down : Vector3.up;
+        Vector3 direction;
+        if (_enemyShootBackwards && isEnemy)
+        {
+            direction = Vector3.up;
+        }
+        else
+        {
+            direction = isEnemy ? Vector3.down : Vector3.up;
+        }
         transform.Translate(_speed * Time.deltaTime * direction);
         Destroy(gameObject, 2);
         if (transform.parent != null)
@@ -31,6 +40,11 @@ public class Laser : MonoBehaviour
     public void setIsEnemy(bool value)
     {
         isEnemy = value;
+    }
+
+    public void setEnemyShootBackwards(bool value)
+    {
+        _enemyShootBackwards = value;
     }
 
     /// <summary>
