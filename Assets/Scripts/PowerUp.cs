@@ -11,6 +11,7 @@ public enum PowerUps
     Ammo,
     FirstAid,
     DeathRay,
+    BigBoy,
 }
 
 public class PowerUp : MonoBehaviour
@@ -76,6 +77,9 @@ public class PowerUp : MonoBehaviour
                 {
                     case PowerUps.TrippleShot:
                         player.CollectPowerShootingUp(ShootingModes.TrippleShot);
+                        break;
+                    case PowerUps.BigBoy:
+                        player.CollectPowerShootingUp(ShootingModes.BigBoy);
                         break;
                     case PowerUps.SpeedMultiplier:
                         SpeedModes[] options = { SpeedModes.Increased, SpeedModes.Decreased };

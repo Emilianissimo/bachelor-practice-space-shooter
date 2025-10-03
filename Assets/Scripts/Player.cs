@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Perks;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 
 public class Player : MonoBehaviour
 {
@@ -16,6 +15,10 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _laserPrefab;
+
+    [SerializeField]
+    private GameObject _bigBoyPrefab;
+
     [SerializeField]
     private GameObject _trippleLaserPrefab;
 
@@ -92,6 +95,8 @@ public class Player : MonoBehaviour
         {
             { ShootingModes.SingleShot, 1 },
             { ShootingModes.TrippleShot, 3 },
+            { ShootingModes.DeathRay, 0 },
+            { ShootingModes.BigBoy, 0 },
         };
     }
 
@@ -116,7 +121,8 @@ public class Player : MonoBehaviour
         _shootingModes = new Dictionary<ShootingModes, GameObject>
         {
             {ShootingModes.SingleShot, _laserPrefab },
-            {ShootingModes.TrippleShot, _trippleLaserPrefab }
+            {ShootingModes.TrippleShot, _trippleLaserPrefab },
+            {ShootingModes.BigBoy, _bigBoyPrefab }
         };
 
         // Set current thruster charge. On start it is full
@@ -163,9 +169,8 @@ public class Player : MonoBehaviour
         _canFire = Time.time + _fireRate;
         Vector3 pos3 = transform.position;
         if (_shootingMode == ShootingModes.SingleShot)
-        {
             pos3.y += 0.8f;
-        }
+
         Instantiate(
             _shootingModes[_shootingMode],
             pos3,

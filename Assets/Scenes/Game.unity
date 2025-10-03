@@ -666,13 +666,15 @@ MonoBehaviour:
   - {fileID: 7291914558076620069, guid: 66aed5feee2294f5d93ee08170d84fdb, type: 3}
   - {fileID: 3713358726227182100, guid: cd6ae9fe410df4baf825d5c307ac90ba, type: 3}
   - {fileID: 3161738538753905767, guid: e75109764761f413d836f8059c9f113f, type: 3}
+  - {fileID: 4868895033320525367, guid: d140581ac83fb4a44949267ecbff3a38, type: 3}
   _weights:
   - 0.2
   - 0.2
   - 0.2
-  - 0.3
-  - 0.05
-  - 0.05
+  - 0.2
+  - 0.1
+  - 0.09
+  - 0.01
 --- !u!4 &322346203
 Transform:
   m_ObjectHideFlags: 0
@@ -1391,6 +1393,7 @@ MonoBehaviour:
   _speedIncreased: 2
   _speedDecreased: -2
   _laserPrefab: {fileID: 815576980626755866, guid: cdddac3fa14ab1d4c8a4225242f857fe, type: 3}
+  _bigBoyPrefab: {fileID: 3053223830562330735, guid: fdd9bf15cc4274298a215716cc3fd1e9, type: 3}
   _trippleLaserPrefab: {fileID: 23172313767327086, guid: 6b2df81ec5962ab47a05825dbec5ac97, type: 3}
   _fireRate: 0.15
   _lives: 3

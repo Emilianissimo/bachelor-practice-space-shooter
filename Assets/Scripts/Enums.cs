@@ -14,6 +14,7 @@ namespace Perks
 		SingleShot,
 		TrippleShot,
 		DeathRay,
+		BigBoy,
 	}
 
 	public enum SpeedModes

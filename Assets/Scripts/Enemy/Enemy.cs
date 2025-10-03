@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+using Perks;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -30,6 +30,14 @@ public class Enemy : MonoBehaviour
 
     private bool _isRammingPlayer = false;
 
+    [SerializeField]
+    private ShieldStatuses _shieldStatus = ShieldStatuses.Off;
+    [SerializeField]
+    private int _shieldStrength = 1;
+
+    [SerializeField]
+    private GameObject _shieldVisualiser;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,6 +50,8 @@ public class Enemy : MonoBehaviour
         if (_audioSource == null) Debug.LogWarning("AudioSource not found");
 
         _randomX = Random.Range(-1f, 1f);
+
+        SetShieldStatus(Random.Range(0, 2) == 0);
     }
 
     // Update is called once per frame
@@ -154,6 +164,12 @@ public class Enemy : MonoBehaviour
         Shoot();
     }
 
+    public void SetShieldStatus(bool on)
+    {
+        _shieldStatus = on ? ShieldStatuses.On : ShieldStatuses.Off;
+        _shieldVisualiser.SetActive(on);
+    }
+
     /// <summary>
     /// On collide with laser - destroy. On player - destroy & damage.
     /// </summary>
@@ -165,13 +181,12 @@ public class Enemy : MonoBehaviour
             if (other.transform.TryGetComponent<Player>(out var player)) player.Damage(1);
             _isDestroyed = true;
         }
-        if (other.CompareTag("Laser"))
+        if (other.CompareTag("Laser") || other.CompareTag("BigBoy"))
         {
             Destroy(other.gameObject);
             if (_player != null) _player.AddScore(10);
             _isDestroyed = true;
         }
-
         if (other.CompareTag("DeathRay"))
         {
             if (_player != null) _player.AddScore(10);
@@ -180,6 +195,16 @@ public class Enemy : MonoBehaviour
 
         if (_isDestroyed)
         {
+            if (_shieldStatus == ShieldStatuses.On)
+            {
+                _shieldStrength -= 1;
+                if (_shieldStrength < 1)
+                {
+                    SetShieldStatus(false);
+                    _isDestroyed = false;
+                    return;
+                }
+            }
             _animator.SetTrigger("OnEnemyDeath");
             _speed = 0;
             _audioSource.Play();

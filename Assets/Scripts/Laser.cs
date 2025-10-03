@@ -5,7 +5,6 @@ using UnityEngine.UIElements;
 
 public class Laser : MonoBehaviour
 {
-     // Start is called before the first frame update
     [SerializeField]
     private float _speed = 5f;
     public bool isEnemy = false;
