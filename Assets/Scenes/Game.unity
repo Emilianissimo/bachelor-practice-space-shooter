@@ -656,6 +656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyPrefab: {fileID: 7578874304009644042, guid: 0390ffb8764d1234b960110c552b613d, type: 3}
+  _bossPrefab: {fileID: 1677350675344225588, guid: 289609281308342d89acde54afb82c67, type: 3}
   _dronKillerPrefab: {fileID: 7513596392038561926, guid: 223ef151ae569480d96c1789f6496a0b, type: 3}
   _enemyContainer: {fileID: 205438074}
   _trippleShotPowerUpPrefab: {fileID: 5912819116568338215, guid: 6a075475cabdd4b4aa39f6380e55c64f, type: 3}
@@ -677,6 +678,8 @@ MonoBehaviour:
   - 0.01
   _wavesCountToBoss: 3
   _enemyAmountPerWave: 010000000200000003000000
+  _currentWave: 1
+  _lockSpawning: 0
 --- !u!4 &322346203
 Transform:
   m_ObjectHideFlags: 0

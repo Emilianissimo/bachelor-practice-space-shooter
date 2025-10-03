@@ -58,7 +58,7 @@ public class DronKiller : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (other.transform.TryGetComponent<Player>(out var player)) player.Damage(1);
+            _player.Damage(1);
             _isDestroyed = true;
         }
         if (other.CompareTag("Laser") || other.CompareTag("BigBoy"))

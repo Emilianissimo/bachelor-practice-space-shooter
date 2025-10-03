@@ -9,6 +9,9 @@ public class SpawnManager : MonoBehaviour
     private GameObject _enemyPrefab;
 
     [SerializeField]
+    private GameObject _bossPrefab;
+
+    [SerializeField]
     private GameObject _dronKillerPrefab;
 
     [SerializeField]
@@ -32,6 +35,7 @@ public class SpawnManager : MonoBehaviour
     private int _currentWave = 1;
     [SerializeField]
     private bool _lockSpawning = false;
+    private bool _bossActive = false;
 
     public void StartSpawning()
     {
@@ -51,12 +55,20 @@ public class SpawnManager : MonoBehaviour
 
     public void CheckEnemiesOnField()
     {
+        if (_bossActive) return;
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        if (enemies.Length == 0)
+        if (enemies.Length == 0 && _lockSpawning)
         {
             setWave(_currentWave + 1);
             _lockSpawning = false;
         }
+    }
+
+    public void OnBossDeath()
+    {
+        _bossActive = false;
+        setWave(1);
+        _lockSpawning = false;
     }
 
     /// <summary>
@@ -80,13 +92,22 @@ public class SpawnManager : MonoBehaviour
             // Run boss each 3 waves
             if (_currentWave % _wavesCountToBoss == 0)
             {
-                // prevent freeze
+                _lockSpawning = true;
+                _bossActive = true;
+                GameObject boss = Instantiate(
+                    _bossPrefab,
+                    new Vector3(0, 7, 0),
+                    Quaternion.identity
+                );
+                boss.transform.SetParent(_enemyContainer.transform);
+                // To prevent freeze, next frame
                 yield return null;
-                continue;
             }
             // Start spawn for current wave in amount of needed per wave
             else
             {
+                // Lock spawning until all will be killed
+                _lockSpawning = true;
                 for (int i = 0; i < _enemyAmountPerWave[_currentWave - 1]; i++)
                 {
                     Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
@@ -105,8 +126,6 @@ public class SpawnManager : MonoBehaviour
                     newDronKiller.transform.SetParent(_enemyContainer.transform);
                     yield return new WaitForSeconds(5.0f);
                 }
-                // Lock spawning until all will be killed
-                _lockSpawning = true;
             }
         }
     }
