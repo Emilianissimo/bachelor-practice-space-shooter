@@ -6,8 +6,6 @@ public class BigBoy : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 5f;
-    [SerializeField] private float _rotateSpeed = 200f;
-
     private GameObject _nearest = null;
 
     void Start()

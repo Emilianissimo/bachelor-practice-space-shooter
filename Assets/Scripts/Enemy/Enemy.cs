@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    private SpawnManager _spawnManager;
+
     [SerializeField]
     private float _speed = 2f;
 
@@ -48,6 +50,8 @@ public class Enemy : MonoBehaviour
         if (_animator == null) Debug.LogWarning("Animation not found");
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) Debug.LogWarning("AudioSource not found");
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        if (_spawnManager == null) Debug.LogError("The SpawnManager not found");
 
         _randomX = Random.Range(-1f, 1f);
 
@@ -86,7 +90,7 @@ public class Enemy : MonoBehaviour
             // Player is dead.
             return;
         }
-            
+
         pos3.y -= gap;
         GameObject laser = Instantiate(
             _laserPrefab,
@@ -214,5 +218,10 @@ public class Enemy : MonoBehaviour
             }
             Destroy(this.gameObject, 2.8f);
         }
+    }
+    
+    private void OnDestroy()
+    {
+        if (_spawnManager != null) _spawnManager.CheckEnemiesOnField();
     }
 }

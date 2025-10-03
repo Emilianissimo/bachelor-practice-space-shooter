@@ -675,6 +675,8 @@ MonoBehaviour:
   - 0.1
   - 0.09
   - 0.01
+  _wavesCountToBoss: 3
+  _enemyAmountPerWave: 010000000200000003000000
 --- !u!4 &322346203
 Transform:
   m_ObjectHideFlags: 0

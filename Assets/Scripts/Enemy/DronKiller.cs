@@ -15,6 +15,8 @@ public class DronKiller : MonoBehaviour
     private float _directionX = -1;
     private bool _isDestroyed = false;
 
+    private SpawnManager _spawnManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +30,8 @@ public class DronKiller : MonoBehaviour
         if (_animator == null) Debug.LogWarning("Animation not found");
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) Debug.LogWarning("AudioSource not found");
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        if (_spawnManager == null) Debug.LogError("The SpawnManager not found");
     }
 
     // Update is called once per frame
@@ -78,5 +82,11 @@ public class DronKiller : MonoBehaviour
             Destroy(GetComponent<Collider2D>());
             Destroy(this.gameObject, 2.8f);
         }
+    }
+
+    // Because of timing, we need to be sure
+    private void OnDestroy()
+    {
+        if (_spawnManager != null) _spawnManager.CheckEnemiesOnField();
     }
 }

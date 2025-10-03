@@ -22,6 +22,17 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private List<float> _weights;
 
+    [SerializeField]
+    private int _wavesCountToBoss = 3;
+
+    [SerializeField]
+    private int[] _enemyAmountPerWave;
+
+    [SerializeField]
+    private int _currentWave = 1;
+    [SerializeField]
+    private bool _lockSpawning = false;
+
     public void StartSpawning()
     {
         StartCoroutine(EnemiesSpawnRoutine());
@@ -31,6 +42,21 @@ public class SpawnManager : MonoBehaviour
     public void OnPlayerDeath()
     {
         _spawning = false;
+    }
+
+    public void setWave(int wave)
+    {
+        _currentWave = wave;
+    }
+
+    public void CheckEnemiesOnField()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if (enemies.Length == 0)
+        {
+            setWave(_currentWave + 1);
+            _lockSpawning = false;
+        }
     }
 
     /// <summary>
@@ -43,21 +69,45 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
         while (_spawning)
         {
-            Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
-            GameObject newEnemy = Instantiate(
-                _enemyPrefab,
-                enemyPosition,
-                Quaternion.identity
-            );
-            Vector3 dronKillerPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
-            GameObject newDronKiller = Instantiate(
-                _dronKillerPrefab,
-                dronKillerPosition,
-                Quaternion.identity
-            );
-            newEnemy.transform.SetParent(_enemyContainer.transform);
-            newDronKiller.transform.SetParent(_enemyContainer.transform);
-            yield return new WaitForSeconds(5.0f);
+            // if still locked nothing to do.
+            if (_lockSpawning)
+            {
+                // wait next frame to prevent freeze
+                yield return null;
+                continue;
+            }
+            ;
+            // Run boss each 3 waves
+            if (_currentWave % _wavesCountToBoss == 0)
+            {
+                // prevent freeze
+                yield return null;
+                continue;
+            }
+            // Start spawn for current wave in amount of needed per wave
+            else
+            {
+                for (int i = 0; i < _enemyAmountPerWave[_currentWave - 1]; i++)
+                {
+                    Vector3 enemyPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
+                    GameObject newEnemy = Instantiate(
+                        _enemyPrefab,
+                        enemyPosition,
+                        Quaternion.identity
+                    );
+                    Vector3 dronKillerPosition = new(Random.Range(-11.5f, 11.5f), 7, 0);
+                    GameObject newDronKiller = Instantiate(
+                        _dronKillerPrefab,
+                        dronKillerPosition,
+                        Quaternion.identity
+                    );
+                    newEnemy.transform.SetParent(_enemyContainer.transform);
+                    newDronKiller.transform.SetParent(_enemyContainer.transform);
+                    yield return new WaitForSeconds(5.0f);
+                }
+                // Lock spawning until all will be killed
+                _lockSpawning = true;
+            }
         }
     }
 
